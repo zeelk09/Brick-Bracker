@@ -1,0 +1,38 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+public class PlayerManager : MonoBehaviour {
+    // List to store position GameObjects
+    public List<GameObject> playerPositions;
+
+    // Method to be called when a new set of player positions is received from the server
+    public void OnPlayerPositionsReceived(List<int> serverPositions) {
+        foreach (int serverPosition in serverPositions) {
+            bool positionFound = false;
+
+            foreach (GameObject positionObject in playerPositions) {
+                // Check if the positionObject has any children
+                if (positionObject.transform.childCount > 0) {
+                    // Assuming the first child is the player
+                    Transform playerTransform = positionObject.transform.GetChild(0);
+                    PlayerInfo playerInfo = playerTransform.GetComponent<PlayerInfo>();
+
+                    if (playerInfo != null && playerInfo.playerPosition == serverPosition) {
+                        Debug.Log($"Player with position {serverPosition} found.");
+                        positionFound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!positionFound) {
+                Debug.Log($"Player with position {serverPosition} not found.");
+            }
+        }
+    }
+}
+
+public class PlayerInfo : MonoBehaviour {
+    // Player position
+    public int playerPosition;
+}
